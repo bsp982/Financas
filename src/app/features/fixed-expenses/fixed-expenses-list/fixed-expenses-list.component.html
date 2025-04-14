@@ -1,0 +1,69 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Despesas Fixas</mat-card-title>
+    <button mat-raised-button color="primary" (click)="openForm()">
+      <mat-icon>add</mat-icon>
+      Nova Despesa
+    </button>
+  </mat-card-header>
+
+  <mat-card-content>
+    <table mat-table [dataSource]="fixedExpenses">
+      <!-- Nome Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Nome </th>
+        <td mat-cell *matCellDef="let expense"> {{expense.name}} </td>
+      </ng-container>
+
+      <!-- Valor Column -->
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef> Valor </th>
+        <td mat-cell *matCellDef="let expense"> {{expense.amount | currency:'BRL'}} </td>
+      </ng-container>
+
+      <!-- Vencimento Column -->
+      <ng-container matColumnDef="dueDate">
+        <th mat-header-cell *matHeaderCellDef> Vencimento </th>
+        <td mat-cell *matCellDef="let expense"> {{expense.dueDate}} </td>
+      </ng-container>
+
+      <!-- Categoria Column -->
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef> Categoria </th>
+        <td mat-cell *matCellDef="let expense"> {{expense.category}} </td>
+      </ng-container>
+
+      <!-- Cartão Column -->
+      <ng-container matColumnDef="creditCard">
+        <th mat-header-cell *matHeaderCellDef> Cartão </th>
+        <td mat-cell *matCellDef="let expense"> {{getCreditCardName(expense.creditCardId)}} </td>
+      </ng-container>
+
+      <!-- Ativo Column -->
+      <ng-container matColumnDef="active">
+        <th mat-header-cell *matHeaderCellDef> Ativo </th>
+        <td mat-cell *matCellDef="let expense">
+          <mat-icon [color]="expense.active ? 'primary' : 'warn'">
+            {{expense.active ? 'check_circle' : 'cancel'}}
+          </mat-icon>
+        </td>
+      </ng-container>
+
+      <!-- Ações Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Ações </th>
+        <td mat-cell *matCellDef="let expense">
+          <button mat-icon-button color="primary" (click)="openForm(expense)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteExpense(expense.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </mat-card-content>
+</mat-card> 

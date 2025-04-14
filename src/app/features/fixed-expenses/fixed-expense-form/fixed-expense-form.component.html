@@ -1,0 +1,62 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar' : 'Nova' }} Despesa Fixa</h2>
+
+<form [formGroup]="form" class="form-container">
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nome</mat-label>
+      <input matInput formControlName="name" placeholder="Ex: Aluguel">
+      <mat-error *ngIf="form.get('name')?.hasError('required')">
+        Nome é obrigatório
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Valor</mat-label>
+      <input matInput formControlName="amount" type="number" placeholder="Ex: 1500">
+      <mat-error *ngIf="form.get('amount')?.hasError('required')">
+        Valor é obrigatório
+      </mat-error>
+      <mat-error *ngIf="form.get('amount')?.hasError('min')">
+        Valor deve ser maior que zero
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Dia do Vencimento</mat-label>
+      <input matInput formControlName="dueDate" type="number" placeholder="Ex: 10">
+      <mat-error *ngIf="form.get('dueDate')?.hasError('required')">
+        Dia do vencimento é obrigatório
+      </mat-error>
+      <mat-error *ngIf="form.get('dueDate')?.hasError('min') || form.get('dueDate')?.hasError('max')">
+        Dia deve estar entre 1 e 31
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Categoria</mat-label>
+      <input matInput formControlName="category" placeholder="Ex: Moradia">
+      <mat-error *ngIf="form.get('category')?.hasError('required')">
+        Categoria é obrigatória
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Cartão de Crédito</mat-label>
+      <mat-select formControlName="creditCardId">
+        <mat-option [value]="''">Nenhum</mat-option>
+        <mat-option *ngFor="let card of creditCards" [value]="card.id">
+          {{ card.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-checkbox formControlName="active">Ativo</mat-checkbox>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancelar</button>
+    <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="onSubmit()">
+      Salvar
+    </button>
+  </mat-dialog-actions>
+</form> 

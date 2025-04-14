@@ -1,0 +1,29 @@
+mat-card {
+  margin: 16px;
+}
+
+mat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-column-actions {
+  width: 120px;
+  text-align: center;
+}
+
+.mat-column-active {
+  width: 80px;
+  text-align: center;
+}
+
+.mat-column-amount {
+  text-align: right;
+  padding-right: 16px;
+} 

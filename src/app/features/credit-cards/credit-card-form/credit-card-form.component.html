@@ -1,0 +1,64 @@
+<h2 mat-dialog-title>{{isEdit ? 'Editar' : 'Novo'}} Cartão de Crédito</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nome</mat-label>
+      <input matInput formControlName="name" placeholder="Nome do cartão">
+      <mat-error *ngIf="form.get('name')?.hasError('required')">
+        Nome é obrigatório
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Limite</mat-label>
+      <input matInput type="number" formControlName="limit" placeholder="Limite do cartão">
+      <span matPrefix>R$&nbsp;</span>
+      <mat-error *ngIf="form.get('limit')?.hasError('required')">
+        Limite é obrigatório
+      </mat-error>
+      <mat-error *ngIf="form.get('limit')?.hasError('min')">
+        Limite deve ser maior que zero
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Dia do Vencimento</mat-label>
+      <input matInput type="number" formControlName="dueDate" placeholder="Dia do vencimento">
+      <mat-error *ngIf="form.get('dueDate')?.hasError('required')">
+        Dia do vencimento é obrigatório
+      </mat-error>
+      <mat-error *ngIf="form.get('dueDate')?.hasError('min') || form.get('dueDate')?.hasError('max')">
+        Dia deve estar entre 1 e 31
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Dia do Fechamento</mat-label>
+      <input matInput type="number" formControlName="closingDate" placeholder="Dia do fechamento">
+      <mat-error *ngIf="form.get('closingDate')?.hasError('required')">
+        Dia do fechamento é obrigatório
+      </mat-error>
+      <mat-error *ngIf="form.get('closingDate')?.hasError('min') || form.get('closingDate')?.hasError('max')">
+        Dia deve estar entre 1 e 31
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Cor</mat-label>
+      <input matInput type="color" formControlName="color">
+      <mat-error *ngIf="form.get('color')?.hasError('required')">
+        Cor é obrigatória
+      </mat-error>
+    </mat-form-field>
+
+    <mat-checkbox formControlName="active">Ativo</mat-checkbox>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+      {{isEdit ? 'Salvar' : 'Criar'}}
+    </button>
+  </mat-dialog-actions>
+</form> 
