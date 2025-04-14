@@ -1,1 +1,151 @@
 /* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+// Incluir os estilos comuns do Angular Material
+@include mat.core();
+
+// Definir as cores do tema
+$primary-palette: (
+  50: #e8eaf6,
+  100: #c5cae9,
+  200: #9fa8da,
+  300: #7986cb,
+  400: #5c6bc0,
+  500: #3f51b5,
+  600: #3949ab,
+  700: #303f9f,
+  800: #283593,
+  900: #1a237e,
+  A100: #8c9eff,
+  A200: #536dfe,
+  A400: #3d5afe,
+  A700: #304ffe,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: white,
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: white,
+    A400: white,
+    A700: white,
+  )
+);
+
+$accent-palette: (
+  50: #e0f7fa,
+  100: #b2ebf2,
+  200: #80deea,
+  300: #4dd0e1,
+  400: #26c6da,
+  500: #00bcd4,
+  600: #00acc1,
+  700: #0097a7,
+  800: #00838f,
+  900: #006064,
+  A100: #84ffff,
+  A200: #18ffff,
+  A400: #00e5ff,
+  A700: #00b8d4,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: rgba(black, 0.87),
+    A400: rgba(black, 0.87),
+    A700: white,
+  )
+);
+
+// Criar as paletas de cores
+$financas-primary: mat.define-palette($primary-palette);
+$financas-accent: mat.define-palette($accent-palette);
+
+// Criar o tema
+$financas-theme: mat.define-light-theme((
+  color: (
+    primary: $financas-primary,
+    accent: $financas-accent,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+// Aplicar o tema
+@include mat.all-component-themes($financas-theme);
+
+// Estilos globais
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+// Estilos para o sidenav
+.mat-sidenav-container {
+  height: 100vh;
+}
+
+.mat-sidenav {
+  width: 250px;
+}
+
+// Estilos para os cards
+.mat-card {
+  margin: 16px;
+}
+
+// Estilos para os botões
+.mat-button, .mat-raised-button {
+  margin: 8px;
+}
+
+// Estilos para os formulários
+.mat-form-field {
+  width: 100%;
+  margin: 8px 0;
+}
+
+// Estilos para as tabelas
+.mat-table {
+  width: 100%;
+}
+
+// Estilos para os diálogos
+.mat-dialog-container {
+  padding: 24px;
+}
+
+$my-primary: mat.define-palette(mat.$indigo-palette, 500);
+$my-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$my-warn: mat.define-palette(mat.$red-palette);
+
+$my-theme: mat.define-light-theme((
+  color: (
+    primary: $my-primary,
+    accent: $my-accent,
+    warn: $my-warn,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+@include mat.all-component-themes($my-theme);
+
+.mat-mdc-dialog-container {
+  --mdc-dialog-container-color: white;
+}
