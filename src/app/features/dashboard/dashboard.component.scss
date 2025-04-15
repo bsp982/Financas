@@ -1,5 +1,7 @@
+@use '@angular/material' as mat;
+
 .dashboard-container {
-  padding: 16px;
+  padding: 20px;
 }
 
 .summary-card {
@@ -8,33 +10,72 @@
 }
 
 .summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
-  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
 }
 
 .summary-item {
+  flex: 1 1 250px;
+  max-width: 270px;
+  min-width: 220px;
   text-align: center;
-  padding: 16px;
-  border-radius: 4px;
-  background-color: mat.get-color-from-palette($primary, 50);
+  padding: 28px 16px 20px 16px;
+  border-radius: 16px;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s;
+}
+
+.summary-item .material-icons {
+  font-size: 56px;
+  margin-bottom: 12px;
+  display: block;
 }
 
 .positive {
-  color: mat.get-color-from-palette($success, 700);
-  font-size: 24px;
-  font-weight: 500;
+  background: #e8f5e9;
+  color: #388e3c;
 }
 
 .negative {
-  color: mat.get-color-from-palette($warn, 700);
-  font-size: 24px;
-  font-weight: 500;
+  background: #ffebee;
+  color: #c62828;
 }
 
 .neutral {
-  color: mat.get-color-from-palette($primary, 700);
-  font-size: 24px;
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.purple {
+  background: #ede7f6;
+  color: #6a1b9a;
+}
+
+.summary-item h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.summary-item p {
+  margin: 0;
+  font-size: 1.3rem;
   font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .summary-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+  .summary-item {
+    max-width: 100%;
+    width: 100%;
+  }
 } 

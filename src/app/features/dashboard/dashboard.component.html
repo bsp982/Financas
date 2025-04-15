@@ -5,17 +5,25 @@
     </mat-card-header>
     <mat-card-content>
       <div class="summary-grid">
-        <div class="summary-item">
+        <div class="summary-item positive">
+          <span class="material-icons">trending_up</span>
           <h3>Receitas</h3>
-          <p class="positive">R$ 0,00</p>
+          <p>R$ 0,00</p>
         </div>
-        <div class="summary-item">
+        <div class="summary-item negative">
+          <span class="material-icons">trending_down</span>
           <h3>Despesas</h3>
-          <p class="negative">R$ 0,00</p>
+          <p>{{ totalDespesas | currency:'BRL' }}</p>
         </div>
-        <div class="summary-item">
+        <div class="summary-item neutral">
+          <span class="material-icons">account_balance</span>
           <h3>Saldo</h3>
-          <p class="neutral">R$ 0,00</p>
+          <p>R$ 0,00</p>
+        </div>
+        <div class="summary-item neutral">
+          <span class="material-icons">credit_card</span>
+          <h3>Total Faturas Cartões</h3>
+          <p>{{ totalFaturas | currency:'BRL' }}</p>
         </div>
       </div>
     </mat-card-content>
