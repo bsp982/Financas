@@ -18,12 +18,20 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AppComponent } from './app.component';
 import { DashboardModule } from './features/dashboard/dashboard.module';
 import { CreditCardsModule } from './features/credit-cards/credit-cards.module';
 import { FixedExpensesModule } from './features/fixed-expenses/fixed-expenses.module';
 import { IncomeModule } from './features/income/income.module';
 import { AppRoutingModule } from './app-routing.module';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -54,7 +62,14 @@ import { AppRoutingModule } from './app-routing.module';
     MatSelectModule,
     MatDialogModule,
     MatProgressBarModule,
-    NgxChartsModule
+    NgxChartsModule,
+    MatGridListModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatSnackBarModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule,
+    AngularFireAuthModule
   ],
   providers: [],
   bootstrap: [AppComponent]

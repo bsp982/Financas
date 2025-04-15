@@ -5,13 +5,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { CreditCardFormComponent } from '../credit-card-form/credit-card-form.component';
-
-interface CreditCard {
-  id?: string;
-  name: string;
-  limit: number;
-  dueDate: string;
-}
+import { CreditCardTransactionsComponent } from '../credit-card-transactions/credit-card-transactions.component';
+import { CreditCard } from '../../../core/models/credit-card.model';
+import { CreditCardTransaction } from '../../../core/models/credit-card-transaction.model';
+import { FinanceService } from '../../../core/services/finance.service';
 
 @Component({
   selector: 'app-credit-cards-list',
@@ -33,29 +30,46 @@ interface CreditCard {
         </button>
       </div>
 
-      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+      <table mat-table [dataSource]="creditCards" class="mat-elevation-z8">
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>Nome</th>
-          <td mat-cell *matCellDef="let element">{{element.name}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="limit">
-          <th mat-header-cell *matHeaderCellDef>Limite</th>
-          <td mat-cell *matCellDef="let element">{{element.limit | currency:'BRL'}}</td>
+          <td mat-cell *matCellDef="let card">{{card.name}}</td>
         </ng-container>
 
         <ng-container matColumnDef="dueDate">
           <th mat-header-cell *matHeaderCellDef>Vencimento</th>
-          <td mat-cell *matCellDef="let element">{{element.dueDate}}</td>
+          <td mat-cell *matCellDef="let card">{{card.dueDate}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="closingDate">
+          <th mat-header-cell *matHeaderCellDef>Fechamento</th>
+          <td mat-cell *matCellDef="let card">{{card.closingDate}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="total">
+          <th mat-header-cell *matHeaderCellDef>Total da Fatura</th>
+          <td mat-cell *matCellDef="let card">{{getTotal(card.id) | currency:'BRL'}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="active">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let card">
+            <mat-icon [color]="card.active ? 'primary' : 'warn'">
+              {{card.active ? 'check_circle' : 'cancel'}}
+            </mat-icon>
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>Ações</th>
-          <td mat-cell *matCellDef="let element">
-            <button mat-icon-button color="primary" (click)="openForm(element)">
+          <td mat-cell *matCellDef="let card">
+            <button mat-icon-button color="primary" (click)="openTransactions(card)">
+              <mat-icon>receipt_long</mat-icon>
+            </button>
+            <button mat-icon-button color="primary" (click)="openForm(card)">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button color="warn" (click)="deleteCard(element)">
+            <button mat-icon-button color="warn" (click)="deleteCard(card)">
               <mat-icon>delete</mat-icon>
             </button>
           </td>
@@ -83,19 +97,49 @@ interface CreditCard {
     }
 
     .mat-column-actions {
-      width: 120px;
+      width: 160px;
       text-align: center;
+    }
+
+    .mat-column-active {
+      width: 80px;
+      text-align: center;
+    }
+
+    .mat-column-total {
+      text-align: right;
+      padding-right: 16px;
     }
   `]
 })
 export class CreditCardsListComponent {
-  displayedColumns: string[] = ['name', 'limit', 'dueDate', 'actions'];
-  dataSource: CreditCard[] = [
-    { id: '1', name: 'Nubank', limit: 5000, dueDate: '10' },
-    { id: '2', name: 'Itaú', limit: 3000, dueDate: '15' }
-  ];
+  displayedColumns: string[] = ['name', 'dueDate', 'closingDate', 'total', 'active', 'actions'];
+  creditCards: CreditCard[] = [];
+  transactions: CreditCardTransaction[] = [];
 
-  constructor(private dialog: MatDialog) {}
+  constructor(
+    private dialog: MatDialog,
+    private financeService: FinanceService
+  ) {
+    this.loadCreditCards();
+    this.loadTransactions();
+  }
+
+  loadCreditCards(): void {
+    this.creditCards = this.financeService.getCreditCards();
+  }
+
+  loadTransactions(): void {
+    this.financeService.getCreditCardTransactions().subscribe(transactions => {
+      this.transactions = transactions;
+    });
+  }
+
+  getTotal(cardId: string): number {
+    return this.transactions
+      .filter(t => t.creditCardId === cardId)
+      .reduce((total, t) => total + t.amount, 0);
+  }
 
   openForm(card?: CreditCard): void {
     const dialogRef = this.dialog.open(CreditCardFormComponent, {
@@ -105,16 +149,27 @@ export class CreditCardsListComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Atualizar lista quando o diálogo for fechado com sucesso
-        console.log('Cartão salvo:', result);
+        if (card) {
+          this.financeService.updateCreditCard({ ...card, ...result });
+        } else {
+          this.financeService.addCreditCard(result);
+        }
+        this.loadCreditCards();
       }
+    });
+  }
+
+  openTransactions(card: CreditCard): void {
+    const dialogRef = this.dialog.open(CreditCardTransactionsComponent, {
+      width: '800px',
+      data: card
     });
   }
 
   deleteCard(card: CreditCard): void {
     if (confirm('Tem certeza que deseja excluir este cartão?')) {
-      // Implementar lógica de exclusão
-      console.log('Cartão excluído:', card);
+      this.financeService.deleteCreditCard(card.id);
+      this.loadCreditCards();
     }
   }
 } 

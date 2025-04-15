@@ -1,10 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CreditCard } from '../../../core/models/credit-card.model';
+import { Inject } from '@angular/core';
 
 @Component({
   selector: 'app-credit-card-form',
@@ -15,6 +18,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
+    MatCheckboxModule,
     ReactiveFormsModule
   ],
   template: `
@@ -30,14 +34,6 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Limite</mat-label>
-          <input matInput formControlName="limit" type="number" placeholder="Ex: 5000">
-          <mat-error *ngIf="form.get('limit')?.hasError('required')">
-            Limite é obrigatório
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
           <mat-label>Dia do Vencimento</mat-label>
           <input matInput formControlName="dueDate" type="number" placeholder="Ex: 10">
           <mat-error *ngIf="form.get('dueDate')?.hasError('required')">
@@ -47,12 +43,25 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
             Dia deve estar entre 1 e 31
           </mat-error>
         </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Dia do Fechamento</mat-label>
+          <input matInput formControlName="closingDate" type="number" placeholder="Ex: 5">
+          <mat-error *ngIf="form.get('closingDate')?.hasError('required')">
+            Dia do fechamento é obrigatório
+          </mat-error>
+          <mat-error *ngIf="form.get('closingDate')?.hasError('min') || form.get('closingDate')?.hasError('max')">
+            Dia deve estar entre 1 e 31
+          </mat-error>
+        </mat-form-field>
+
+        <mat-checkbox formControlName="active">Ativo</mat-checkbox>
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancelar</button>
-      <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="save()">
-        Salvar
+      <button mat-button (click)="onCancel()">Cancelar</button>
+      <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="onSubmit()">
+        {{isEdit ? 'Salvar' : 'Criar'}}
       </button>
     </mat-dialog-actions>
   `,
@@ -72,19 +81,29 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 export class CreditCardFormComponent {
   form: FormGroup;
   isEdit = false;
+  @Inject(MAT_DIALOG_DATA) public data!: CreditCard;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private dialogRef: MatDialogRef<CreditCardFormComponent>
+  ) {
+    this.isEdit = !!this.data;
+    
     this.form = this.fb.group({
-      name: ['', Validators.required],
-      limit: ['', Validators.required],
-      dueDate: ['', [Validators.required, Validators.min(1), Validators.max(31)]]
+      name: [this.data?.name || '', Validators.required],
+      dueDate: [this.data?.dueDate || 1, [Validators.required, Validators.min(1), Validators.max(31)]],
+      closingDate: [this.data?.closingDate || 1, [Validators.required, Validators.min(1), Validators.max(31)]],
+      active: [this.data?.active ?? true]
     });
   }
 
-  save() {
+  onSubmit(): void {
     if (this.form.valid) {
-      // Implementar lógica de salvamento
-      console.log(this.form.value);
+      this.dialogRef.close(this.form.value);
     }
+  }
+
+  onCancel(): void {
+    this.dialogRef.close();
   }
 } 
