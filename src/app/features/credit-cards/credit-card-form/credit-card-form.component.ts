@@ -34,6 +34,17 @@ import { Inject } from '@angular/core';
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Valor da Fatura</mat-label>
+          <input matInput formControlName="statementAmount" type="number" placeholder="Ex: 1000.00">
+          <mat-error *ngIf="form.get('statementAmount')?.hasError('required')">
+            Valor da fatura é obrigatório
+          </mat-error>
+          <mat-error *ngIf="form.get('statementAmount')?.hasError('min')">
+            Valor deve ser maior que zero
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
           <mat-label>Dia do Vencimento</mat-label>
           <input matInput formControlName="dueDate" type="number" placeholder="Ex: 10">
           <mat-error *ngIf="form.get('dueDate')?.hasError('required')">
@@ -91,6 +102,7 @@ export class CreditCardFormComponent {
     
     this.form = this.fb.group({
       name: [this.data?.name || '', Validators.required],
+      statementAmount: [this.data?.statementAmount || 0, [Validators.required, Validators.min(0.01)]],
       dueDate: [this.data?.dueDate || 1, [Validators.required, Validators.min(1), Validators.max(31)]],
       closingDate: [this.data?.closingDate || 1, [Validators.required, Validators.min(1), Validators.max(31)]],
       active: [this.data?.active ?? true]

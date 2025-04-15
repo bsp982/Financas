@@ -27,6 +27,10 @@ export class FinanceService {
     }
   }
 
+  private generateId(): string {
+    return crypto.randomUUID();
+  }
+
   // Métodos para Cartões de Crédito
   getCreditCards(): CreditCard[] {
     return JSON.parse(localStorage.getItem(this.CREDIT_CARDS_KEY) || '[]');
@@ -36,7 +40,8 @@ export class FinanceService {
     const cards = this.getCreditCards();
     const newCard: CreditCard = {
       ...card,
-      id: crypto.randomUUID(),
+      id: this.generateId(),
+      statementAmount: card.statementAmount || 0,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -48,7 +53,10 @@ export class FinanceService {
     const cards = this.getCreditCards();
     const index = cards.findIndex(c => c.id === card.id);
     if (index !== -1) {
-      cards[index] = { ...card, updatedAt: new Date() };
+      cards[index] = {
+        ...card,
+        updatedAt: new Date()
+      };
       localStorage.setItem(this.CREDIT_CARDS_KEY, JSON.stringify(cards));
     }
   }

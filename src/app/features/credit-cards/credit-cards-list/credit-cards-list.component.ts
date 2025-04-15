@@ -7,7 +7,6 @@ import { CommonModule } from '@angular/common';
 import { CreditCardFormComponent } from '../credit-card-form/credit-card-form.component';
 import { CreditCardTransactionsComponent } from '../credit-card-transactions/credit-card-transactions.component';
 import { CreditCard } from '../../../core/models/credit-card.model';
-import { CreditCardTransaction } from '../../../core/models/credit-card-transaction.model';
 import { FinanceService } from '../../../core/services/finance.service';
 
 @Component({
@@ -48,7 +47,7 @@ import { FinanceService } from '../../../core/services/finance.service';
 
         <ng-container matColumnDef="total">
           <th mat-header-cell *matHeaderCellDef>Total da Fatura</th>
-          <td mat-cell *matCellDef="let card">{{getTotal(card.id) | currency:'BRL'}}</td>
+          <td mat-cell *matCellDef="let card">{{card.statementAmount | currency:'BRL'}}</td>
         </ng-container>
 
         <ng-container matColumnDef="active">
@@ -115,30 +114,16 @@ import { FinanceService } from '../../../core/services/finance.service';
 export class CreditCardsListComponent {
   displayedColumns: string[] = ['name', 'dueDate', 'closingDate', 'total', 'active', 'actions'];
   creditCards: CreditCard[] = [];
-  transactions: CreditCardTransaction[] = [];
 
   constructor(
     private dialog: MatDialog,
     private financeService: FinanceService
   ) {
     this.loadCreditCards();
-    this.loadTransactions();
   }
 
   loadCreditCards(): void {
     this.creditCards = this.financeService.getCreditCards();
-  }
-
-  loadTransactions(): void {
-    this.financeService.getCreditCardTransactions().subscribe(transactions => {
-      this.transactions = transactions;
-    });
-  }
-
-  getTotal(cardId: string): number {
-    return this.transactions
-      .filter(t => t.creditCardId === cardId)
-      .reduce((total, t) => total + t.amount, 0);
   }
 
   openForm(card?: CreditCard): void {
@@ -160,7 +145,7 @@ export class CreditCardsListComponent {
   }
 
   openTransactions(card: CreditCard): void {
-    const dialogRef = this.dialog.open(CreditCardTransactionsComponent, {
+    this.dialog.open(CreditCardTransactionsComponent, {
       width: '800px',
       data: card
     });
