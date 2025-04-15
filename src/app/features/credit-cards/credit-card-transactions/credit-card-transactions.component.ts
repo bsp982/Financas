@@ -7,10 +7,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { CreditCard } from '../../../core/models/credit-card.model';
 import { CreditCardTransaction } from '../../../core/models/credit-card-transaction.model';
-import { FinanceService } from '../../../core/services/finance.service';
 import * as XLSX from 'xlsx';
 import { map } from 'rxjs/operators';
 import { CreditCardTransactionService } from '../../../core/services/credit-card-transaction.service';
+import { CurrencyPipe } from '@angular/common';
+    
 @Component({
   selector: 'app-credit-card-transactions',
   standalone: true,
@@ -28,7 +29,7 @@ import { CreditCardTransactionService } from '../../../core/services/credit-card
       <div class="summary">
         <div class="summary-item">
           <span class="label">Total da Fatura:</span>
-          <span class="value">{{getTotal() | currency:'BRL'}}</span>
+          <span class="value">{{data.statementAmount | currency:'BRL'}}</span>
         </div>
       </div>
 
@@ -128,33 +129,25 @@ import { CreditCardTransactionService } from '../../../core/services/credit-card
 export class CreditCardTransactionsComponent {
   displayedColumns: string[] = ['date', 'establishment', 'holder', 'amount', 'installment'];
   transactions: CreditCardTransaction[] = [];
-  isLoading = false;
-
-  @Inject(MAT_DIALOG_DATA) public data!: CreditCard;
+    isLoading = false;
 
   constructor(
+     @Inject(MAT_DIALOG_DATA) public data: CreditCard,
     private dialogRef: MatDialogRef<CreditCardTransactionsComponent>,
-    private financeService: FinanceService,
     private snackBar: MatSnackBar,
     private transactionService: CreditCardTransactionService
-  ) {}
-
-  ngOnInit(): void {
+  ) {
     this.loadTransactions();
   }
 
   loadTransactions(): void {
     this.isLoading = true;
-    this.financeService.getCreditCardTransactions()
-      .pipe(
-        map(transactions => transactions
-          .filter(t => t.cardName === this.data.name)
-          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        )
-      )
+    this.transactionService.getTransactionsByCard(this.data.name)
       .subscribe({
         next: (transactions) => {
-          this.transactions = transactions;
+          this.transactions = transactions.sort((a, b) => 
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
           this.isLoading = false;
         },
         error: (error) => {
@@ -165,35 +158,43 @@ export class CreditCardTransactionsComponent {
       });
   }
 
-  getTotal(): number {
-    return this.transactions.reduce((total, t) => total + t.amount, 0);
-  }
-
   onFileSelected(event: any): void {
     const file = event.target.files[0];
+    console.log('Arquivo selecionado:', file);
     if (file) {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         try {
+          console.log('Lendo arquivo...');
           const workbook = XLSX.read(e.target.result, { type: 'binary' });
+          console.log('Workbook:', workbook);
           const firstSheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[firstSheetName];
           const data = XLSX.utils.sheet_to_json(worksheet, { raw: true });
+          console.log('Dados da planilha:', data);
           
-          const transactions = data.map((row: any) => ({
-            id: '', // Será gerado pelo serviço
-            date: this.parseExcelDate(row.Data),
-            description: row.Descrição,
-            amount: this.parseAmount(row.Valor),
-            installment: this.parseInstallment(row.Parcela),
-            category: row.Categoria || '',
-            cardName: row.Cartão || '',
-            creditCardId: this.data.id,
-            establishment: row.Estabelecimento || '',
-            holder: row.Portador || '',
-            createdAt: new Date(),
-            updatedAt: new Date()
-          })) as CreditCardTransaction[];
+          const transactions = data.map((row: any) => {
+            const installmentInfo = this.parseInstallment(row.Parcela);
+            return {
+              id: '', // Será gerado pelo serviço
+              date: this.parseExcelDate(row.Data),
+              description: row.Descrição || '',
+              amount: this.parseAmount(row.Valor),
+              category: row.Categoria || '',
+              cardName: this.data.name,
+              creditCardId: this.data.id,
+              establishment: row.Estabelecimento || '',
+              holder: row.Portador || '',
+              installment: installmentInfo ? {
+                current: installmentInfo.current,
+                total: installmentInfo.total
+              } : undefined,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            } as CreditCardTransaction;
+          });
+
+          console.log('Transações convertidas:', transactions);
 
           Promise.all(transactions.map(t => this.transactionService.addTransaction(t)))
             .then(() => {
@@ -208,6 +209,10 @@ export class CreditCardTransactionsComponent {
           console.error('Erro ao processar arquivo:', error);
           this.snackBar.open('Erro ao processar arquivo Excel', 'Fechar', { duration: 3000 });
         }
+      };
+      reader.onerror = (error) => {
+        console.error('Erro ao ler arquivo:', error);
+        this.snackBar.open('Erro ao ler arquivo', 'Fechar', { duration: 3000 });
       };
       reader.readAsBinaryString(file);
     }
