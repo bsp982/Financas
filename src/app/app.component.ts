@@ -24,23 +24,26 @@ import { MatButtonModule } from '@angular/material/button';
       <mat-sidenav #drawer class="sidenav" fixedInViewport
           [mode]="'side'"
           [opened]="true">
-        <mat-toolbar>Menu</mat-toolbar>
+        <mat-toolbar class="sidenav-header">
+          <mat-icon class="header-icon">account_balance</mat-icon>
+          <span>Menu</span>
+        </mat-toolbar>
         <mat-nav-list>
           <a mat-list-item routerLink="/dashboard" routerLinkActive="active">
-            <mat-icon>dashboard</mat-icon>
-            <span>Dashboard</span>
+            <mat-icon matListItemIcon>dashboard</mat-icon>
+            <span matListItemTitle>Dashboard</span>
           </a>
           <a mat-list-item routerLink="/credit-cards" routerLinkActive="active">
-            <mat-icon>credit_card</mat-icon>
-            <span>Cartões de Crédito</span>
+            <mat-icon matListItemIcon>credit_card</mat-icon>
+            <span matListItemTitle>Cartões de Crédito</span>
           </a>
           <a mat-list-item routerLink="/fixed-expenses" routerLinkActive="active">
-            <mat-icon>account_balance</mat-icon>
-            <span>Despesas Fixas</span>
+            <mat-icon matListItemIcon>payments</mat-icon>
+            <span matListItemTitle>Despesas Fixas</span>
           </a>
           <a mat-list-item routerLink="/income" routerLinkActive="active">
-            <mat-icon>attach_money</mat-icon>
-            <span>Rendas</span>
+            <mat-icon matListItemIcon>trending_up</mat-icon>
+            <span matListItemTitle>Rendas</span>
           </a>
         </mat-nav-list>
       </mat-sidenav>
@@ -68,13 +71,50 @@ import { MatButtonModule } from '@angular/material/button';
 
     .sidenav {
       width: 250px;
+      background-color: #fafafa;
+    }
+
+    .sidenav-header {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      background-color: #3f51b5;
+      color: white;
+      height: 64px;
+    }
+
+    .header-icon {
+      margin-right: 8px;
     }
 
     .content {
       padding: 20px;
     }
 
+    mat-nav-list {
+      padding-top: 8px;
+    }
+
+    mat-nav-list a {
+      height: 48px;
+      margin: 8px 8px;
+      border-radius: 4px;
+    }
+
     .active {
+      background-color: rgba(63, 81, 181, 0.1) !important;
+      color: #3f51b5;
+    }
+
+    .active mat-icon {
+      color: #3f51b5;
+    }
+
+    mat-icon {
+      margin-right: 12px;
+    }
+
+    mat-list-item:hover {
       background-color: rgba(0, 0, 0, 0.04);
     }
   `]

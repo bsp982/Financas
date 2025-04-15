@@ -21,9 +21,6 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [
-    FixedExpensesListComponent
-  ],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -37,7 +34,8 @@ const routes: Routes = [
     MatInputModule,
     MatDatepickerModule,
     MatSelectModule,
-    MatDialogModule
+    MatDialogModule,
+    FixedExpensesListComponent
   ]
 })
 export class FixedExpensesModule { } 
